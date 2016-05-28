@@ -21,7 +21,7 @@ public class Utility {
                     Province province=new Province();
                     province.setProvinceCode(array[0]);
                     province.setProvinceName(array[1]);
-                    coolWeatherDB.saveProvince();
+                    coolWeatherDB.saveProvince(province);
                 }
             }
             return  true;
@@ -39,7 +39,7 @@ public class Utility {
                     city.setCityName(array[1]);
                     city.setCityCode(array[1]);
                     city.setProvinceId(provinceId);
-                    coolWeatherDB.saveCity();
+                    coolWeatherDB.saveCity(city);
                 }
             }
             return  true;
@@ -57,7 +57,7 @@ public class Utility {
                     country.setCountryName(array[1]);
                     country.setCountryCode(array[0]);
                     country.setCityId(cityId);
-                    coolWeatherDB.saveCountry();
+                    coolWeatherDB.saveCountry(country);
                 }
             }
             return  true;
