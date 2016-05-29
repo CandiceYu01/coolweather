@@ -2,7 +2,10 @@ package com.app.candiceyu.coolweather.activity;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
@@ -48,8 +51,15 @@ public class ChooseAreaActivity extends Activity{
     private int currentLevel;
 
     @Override
-    protected void onCreate(Bundle saveInstanceState){
-        super.onCreate(saveInstanceState);
+    protected void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        SharedPreferences preferences= PreferenceManager.getDefaultSharedPreferences(this);
+        if(preferences.getBoolean("selected_city", false)){
+            Intent intent=new Intent(this, WeatherActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.choose_area);
         listView= (ListView) findViewById(R.id.list_view);
@@ -66,10 +76,16 @@ public class ChooseAreaActivity extends Activity{
                 }else if(currentLevel==LEVEL_CITY){
                     selectedCity=cityList.get(position);
                     queryCountries();
+                }else if(currentLevel==LEVEL_COUNTRY){
+                    String countryCode=countryList.get(position).getCountryCode();
+                    Intent intent=new Intent(ChooseAreaActivity.this, WeatherActivity.class);
+                    intent.putExtra("country_code", countryCode);
+                    startActivity(intent);
+                    finish();
                 }
             }
         });
-
+        queryProvices();
     }
 
     private void queryProvices(){
@@ -93,6 +109,7 @@ public class ChooseAreaActivity extends Activity{
     private void queryCities(){
         cityList=coolWeatherDB.getCities(selectedProvince.getId());
         if(cityList.size()>0){
+            dataList.clear();
             for (City c: cityList){
                 dataList.add(c.getCityName());
             }
@@ -108,6 +125,7 @@ public class ChooseAreaActivity extends Activity{
     private void queryCountries(){
         countryList=coolWeatherDB.getCountries(selectedCity.getId());
         if(countryList.size()>0){
+            dataList.clear();
             for (Country c: countryList){
                 dataList.add(c.getCountryName());
             }
@@ -140,7 +158,7 @@ public class ChooseAreaActivity extends Activity{
                 }else if("city".equals(type)){
                     result=Utility.handlerCitiesResponse(coolWeatherDB, response, selectedProvince.getId());
                 }else if("country".equals(type)){
-                    result=Utility.handlerCountriesReponse(coolWeatherDB, response, selectedCity.getId());
+                    result=Utility.handlerCountriesResponse(coolWeatherDB, response, selectedCity.getId());
                 }
 
                 if(result){
